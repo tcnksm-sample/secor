@@ -4,6 +4,10 @@
 DIR=$(cd $(dirname ${0})/.. && pwd)
 cd $DIR
 
+echo "==> Build docker image for secor"
+docker build -t tcnksm/secor .
+
+echo "==> Run secor"
 docker run --rm -it \
        --link kafka:kafka \
        --env AWS_ACCESS_KEY=${AWS_ACCESS_KEY} \
