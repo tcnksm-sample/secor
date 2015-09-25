@@ -1,6 +1,8 @@
-# Secor
+# Secor [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][LICENSE]
 
-This is sample project to try [secor](https://github.com/pinterest/secor), secor is tool for kafka log persistence.
+[LICENSE]: /LICENSE
+
+This is sample project to try [pinterest/secor](https://github.com/pinterest/secor), secor is tool for kafka log persistence.
 
 ## Build
 
