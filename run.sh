@@ -52,23 +52,33 @@ S3_PATH=${S3_PATH:-raw_logs/secor_backup}
 # Local path where sequence files are stored before they are uploaded to s3.
 LOCAL_PATH=${LOCAL_PATH:-/tmp/secor_data/message_logs/backup}
 
-# Parser class that extracts s3 partitions from consumed messages.
-MESSAGE_PARSER_CLASS=${MESSAGE_PARSER_CLASS:-com.pinterest.secor.parser.OffsetMessageParser}
-
-# The secor file reader/writer used to read/write the data, by default we write sequence files
-# secor.file.reader.writer.factory=com.pinterest.secor.io.impl.DelimitedTextFileReaderWriterFactory
-
-# Name of field that contains timestamp for JSON, MessagePack, or Thrift message parser
-TS_NAME=${TS_NAME:-timestamp}
-
-# To enable compression, set this to a valid compression codec implementing
-# org.apache.hadoop.io.compress.CompressionCodec interface, such as
-# 'org.apache.hadoop.io.compress.GzipCodec'.
-# -Dsecor.compression.codec=${COMPRESSION_CODEC} \
-
 # Upload policies
 MAX_FILE_SIZE_BYTE=100000
 MAX_FILE_AGE_SEC=60
+
+# Output grouping
+PARSER=${PARSER:-offset}
+case "${PARSER}" in
+    
+    "offset")
+        CONFIG=secor.prod.backup.properties
+        MESSAGE_PARSER_CLASS=com.pinterest.secor.parser.OffsetMessageParser
+        ;;
+    
+    "json")
+        CONFIG=secor.prod.partition.properties
+        MESSAGE_PARSER_CLASS=com.pinterest.secor.parser.JsonMessageParser               
+        ;;
+    
+    *)
+        echo "Undefined parser. Choose offset|json"
+        exit 1
+    ;; 
+esac
+
+# Name of field that contains timestamp for JSON, MessagePack,
+# or Thrift message parser
+TS_NAME=${TS_NAME:-timestamp}
 
 java -ea \
      -Daws.access.key=${AWS_ACCESS_KEY} \
@@ -91,6 +101,6 @@ java -ea \
      -Dsecor.upload.manager.class=com.pinterest.secor.uploader.S3UploadManager \
      -Dsecor.file.reader.writer.factory=com.pinterest.secor.io.impl.DelimitedTextFileReaderWriterFactory \
      -Dlog4j.configuration=log4j.dev.properties \
-     -Dconfig=secor.prod.backup.properties \
+     -Dconfig=${CONFIG} \
      -cp secor-0.2-SNAPSHOT.jar:lib/* \
      com.pinterest.secor.main.ConsumerMain

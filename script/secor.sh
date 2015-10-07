@@ -14,5 +14,6 @@ docker run --rm -it \
        --env AWS_SECRET_KEY=${AWS_SECRET_KEY} \
        --env AWS_ENDPOINT=${AWS_ENDPOINT} \
        --env S3_BUCKET=${S3_BUCKET} \
+       --env PARSER="json" \
        tcnksm/secor
 
